@@ -1,12 +1,12 @@
 {
   "name": "loom",
   "description": "a simple and powerful API for differential inheritance and AOP",
-  "version": "1.0",
-  "homepage": "https://github.com/rpflorence/punch",
+  "version": "1.0.0",
+  "homepage": "https://github.com/rpflorence/loom",
   "authors": ["Ryan Florence <@ryanflorence>"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/rpflorence/punch.git"
+    "url": "https://github.com/rpflorence/loom.git"
   },
   "main": "./src/loom.js",
   "ender": "./src/ender.js"

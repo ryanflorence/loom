@@ -1,6 +1,6 @@
 /*!
  * loom.js - (c) Ryan Florence 2011
- * github.com/rpflorence/punch
+ * github.com/rpflorence/loom
  * MIT License
  */
 !function (context){
