@@ -1,351 +1,381 @@
-LoomJS
-======
+Loom
+====
 
-Weave the object fabric of your app together with methods for constructing, merging, appending, and mutating objects and their methods.
+Weave your wefts betwixt the warps of loom generators and scaffolds.
 
-LoomJS is a simple and powerful four method API for differential inheritance and AOP. (Mostly taken from [SnackJS][snack].)
+![wefts and warps](http://ryanflorence.com/gifs/warp-weft.gif)
 
-Environments & Installation
----------------------------
+**Loom makes it easy to share best-practices and common patterns for app
+development.**
 
-### Node
+- build a set of generators for public consumption based on some
+  framework or library (like ember, angular, backbone, etc.)
+- consume those sets of generators
+- override those generators
+- build your own generators for your specific app
 
-Install with npm:
+Using Loom Generator Packages from NPM
+--------------------------------------
 
-```bash
-$ npm install loom
+Using generator packages from npm is easy:
+
+```sh
+npm install loom-generators-ember --save
+generate model user name:string age:number
 ```
 
-Require like anything else:
+Then refer to the documentation for the generators you've installed.
 
-```javascript
-var loom = require('loom')
+You must install with `--save` or add the module to your package.json
+instead (that's how loom knows how to use them).
+
+Creating Your Own Generators
+----------------------------
+
+Also, see [the full generator API below](#generator-api)
+
+While using generators others have created for you is great, its awesome
+to have a simple way to make generators for our own apps. Even if you're
+using a set of generators from npm, defining your own generators will
+override them.
+
+### Installation
+
+```sh
+npm install loom -g
+generate --init
 ```
 
-### Ender - Client-Side
+### Templates
 
-Integrates with [Ender][ender].  When building with Ender, the global `loom` object is returned to its rightful owner and the methods are assigned to the Ender global (usually `$`).  So `loom.punch` becomes `$.punch`.
+Initializing loom simply creates some directories in your project. After
+that, all you need is a template in `./loom/templates/`:
 
-```bash
-$ ender build loom
-```
+Lets say we have a lot of "meal" objects in our app, lets make a
+template for what one of these objects looks like:
 
-### Client-Side
+_loom/templates/app/meal.js.hbs_
 
-You can simply include `src/loom.js` into your web page.
-
-License & Copyright
--------------------
-
-(c) Ryan Florence, MIT License
-
-
-
-
-
-
-
-
-
-
-API
-===
-
-
-
-
-
-loom.punch
-----------
-
-Mutates an object method (duck punching, AOP) or simply connects one function to another.
-
-### Signature
-
-```javascript
-loom.punch(obj, method, fn [, auto])
-```
-
-### Arguments
-
-1.	`obj` (<b>object</b>) - The object who's method is getting punched.
-2.	`method` (<b>string</b>) - The name of the object's method.
-3.	`fn` (<b>function</b>) - The new function.
-	__Signature__
-	`function ([old [, argN]])`
-
-	__Arguments__
-	1. `old` (__function__) - The old version of the method, (with context already bound to the object). <b>Note:</b> This argument is passed by default, if the `auto` argument is used then this argument will not be passed
-	2. `argN` (__mixed__) - Any arguments passed when the method is called.
-
-4.	`auto` (__boolean__: optional, defaults to false) - If true, will automatically call the old method before calling the new one.
-
-### Returns
-Undefined
-
-### Examples
-
-```javascript
-var widget = {
-  a: 0,
-  b: 0,
-  add: function (amt){
-    this.a += amt
-  }
+```mustache
+function {{objectName}}() {
+  this.food = '{{params.food}}';
+  this.venue = '{{params.venue}}';
 }
-
-widget.add(1)
-widget.a //> 1
-widget.b //> 0
-
-loom.punch(widget, 'add', function (old, amt){
-  // old is the old version of this method, already bound to widget
-  // call it wherever you want inside of here
-  old(amt)
-  this.b += amt
-})
-
-widget.add(1)
-widget.a //> 2
-widget.b //> 1
-
-loom.punch(widget, 'add', function (){
-  // the last arg (`auto`) is `true`, so old will be called before
-  // this stuff happens.  Effectively the same as calling `old`
-  // on the first line of this new function.
-  console.log("I'm adding stuff!")
-}, true)
-
-widget.add(1) // console logs "I'm adding stuff!"
-widget.a //> 3
-widget.b //> 2
-
-loom.punch(widget, 'add', function (old){
-  return this.a + this.b
-  // since `auto` is not true, and old is not called
-  // this method has been completely overwritten
-})
-
-var res = widget.add()
-res //> 5
-widget.a //> 3 ... unchanged
-widget.b //> 2 ... unchanged
 ```
 
-### Notes
+And then you can generate files based on the template:
 
-When using the `auto` argument, this is extremely similar to `dojo.connect` (minus the DOM events).  It's also not unlike `Extends` and `this.parent` in a MooTools class.  Think of the `old` argument as `this.parent`.
-
-
-
-
-
-loom.construct
---------------
-
-Similar to Object.create, in that it sets the prototype of an object to another.  It also allows for an extension object to merge into the new object. When methods are redefined in the extension object, they are automatically `punched` providing a reference to the old (or parent) method. Useful for object templating and prototypal inheritance.
-
-### Signature
-
-```javascript
-loom.construct(proto [, ext [, mixins]])
+```sh
+generate app/meal.js lunch food:taco venue:cart
 ```
 
-### Arguments
+This will create a file at `app/lunch.js` that looks like:
 
-1. `proto` (__object__) - The object use as the prototype.
-2. `ext` (__object__: optional) - An object to merge into the new object. <b>Note:</b> if a method is redefined then it will be automatically `punched`, providing as the first argument of the method the old method.  Please see the examples.
-3. `mixins` (__array__: optional) - An array of objects to `append` to the new object.
-
-### Returns
-
-Object - A new object with `proto` as its prototype, `ext` merged into it, and `mixins` appended to it.
-
-```javascript
-// construct a generic object
-var point = {
-  coords: {
-    x: 0,
-    y: 0
-  },
-
-  translate: function (x, y){
-    this.coords.x += x
-    this.coords.y += y
-  },
-
-  sum: function (){
-    var sum = 0
-    for (key in this.coords)
-      sum += this.coords[key]
-    return sum
-  }
+```js
+function lunch() {
+  this.food = 'taco';
+  this.venue = 'cart';
 }
-
-// construct a generic object that inherits from the other
-var point3d = loom.construct(point, {
-  // new property
-  z: 0,
-  // redefined method
-  translate: function (old, x, y, z){
-    // if a method exists in the prototype object
-    // then the method here is automatically punched
-    // providing the old method as the first argument
-    old()
-    this.coords.z += z
-  }
-})
-
-// construct objects that inherit from the generic objects (instances, if you will)
-var p = loom.construct(point)
-p.translate(5,10)
-p.coords.x //> 5
-p.coords.y //> 10
-p.sum() //> 15
-p.__proto__ === point //> true
-
-var p3d = loom.construct(point3d)
-p3d.translate(1,2,3) // punched method, note that the signature does not
-                     // include the `old` argument when being called
-p.coords //> {x: 1, y: 2, z: 3}
-p.sum() //> 6, inherited
-p3d.__proto__ === point3d //> true
 ```
 
+Loom, by default, will save files to your app in the same relative
+location they were found in your templates directory.
 
+### Generators
 
+We can define a generator to make everything a little nicer. First we'll
+create a `present` method that determines what data goes to the
+template. Then we'll tell it where to find the template so we can
+simplify the generator command.
 
+_loom/generators/meal.js_
 
-loom.merge
-----------
+```js
+exports.present = function(name, params) {
+  params.constructorName = name.charAt(0).toUpperCase() + name.slice(1);
+  return params;
+};
 
-Merges one or more objects into the first, overwriting previous properties.
-
-### Signature
-
-```javascript
-loom.merge(target, obj [, objN...])
+exports.template = 'app/meal.js.hbs';
 ```
 
-### Arguments
+Now our template is simpler, no more `{{params.food}}` and it
+capitalizes our constructor like a propery lady or gent.
 
-1. `target` (__object__) - The object to receive new properties.
-2. `obj` (__object__) - The object to merge into the first.
-3. `objN` (__object__) - Additional objects to merge into the first, each one overwriting the properties of the previous.
+_loom/templates/meal.js.hbs_
 
-### Returns
-
-Object - The target `obj`, with the other objects merged into it.
-
-### Examples
-
-```javascript
-var coords = {
-  x: 1,
-  y: 1
+```mustache
+function {{constructorName}}() {
+  this.food = '{{food}}';
+  this.venue = '{{venue}}';
 }
-
-loom.merge(coords, {
-  translateY: function (amt){
-    this.y += amt
-  },
-  translateX: function (amt){
-    this.x += amt
-  }
-})
-
-coords.translateY(10);
-coords.y //> 11
 ```
 
+And finally our command is simpler, it now just matches a generator
+named `meal` instead of a template found at `app/meal.js`.
 
+`generate meal lunch food:taco venue:cart`
 
+### Engines
 
+The default generator uses handlebars, but we can swap it out for ejs by
+creating a very simple "engine":
 
-loom.append
------------
+_loom/engines/ejs.js_
 
-Appends the properties of one object onto another, ignoring properties that already exist.
+```js
+var _ = require('underscore');
+// module.exports = _.template
+// that works, but for clarity:
 
-### Signature
-
-```javascript
-loom.append(obj, ext)
+module.exports = function(src, locals) {
+  return _.template(src, locals);
+};
 ```
 
-### Arguments
+Rename your template to `meal.js.ejs` and edit it:
 
-1. `obj` (__object__) - The object to receive new properties.
-2. `ext` (__object__) - The object to append to the first.
-
-### Returns
-
-Object - the `obj`, with new properties.
-
-### Examples
-
-```javascript
-var obj1 = {
-	a: 'foo'
+```ejs
+function <%= constructorName %>() {
+  this.food = '<%= food %>';
+  this.venue = '<%= venue %>';
 }
-
-var obj2 = {
-	a: 'exists already',
-	b: 'bar',
-	c: 'baz'
-}
-
-loom.append(obj1, obj2)
-obj1.a //> 'foo', unchanged since it exists
-obj1.b //> 'bar', appended because it didn't exist
 ```
 
+Update your generator to point to the proper template:
 
-
-
-
-loom.noConflict
----------------
-
-Returns the `loom` to it's previous definition and returns a loom object.
-
-### Signature
-
-```javascript
-loom.noConflict()
+```js
+exports.template = 'app/meal.js.ejs';
 ```
 
-### Returns
+Loom looks at the file extension of the template (in this case `ejs`)
+and then tries to find a template engine named `ejs.js`.
 
-Object - a `loom` object.
+Now generate your newly configured template:
 
-### Examples
+`generate meal lunch food:taco venue:cart`
 
-_Assigning to a new object_
+### Multiple templates for one generator
 
-```javascript
-var loom = 'foo'
+Its very common for a generator to create several files, like unit tests
+and scaffoling. Lets add a unit test template to our meal generator.
 
-// pretend like loom.js is included here
+_loom/templates/test/unit/meal.spec.js.ejs_
 
-typeof loom //> object
-
-var o = loom.noConflict()
-
-loom //> 'foo' back to its rightful owner
-o //> new reference for loom
+```ejs
+describe('<%= constructorName %>', function() {
+  it('sets food to "<%= food %>"', function() {
+    var meal = new <%= constructorName %>();
+    expect(meal.food).to.equal('<%= food %>');
+  });
+});
 ```
 
-_Assigning to global Object_
+And add the template path to your generator, note the rename from
+`exports.template` to `export.templates`.
 
-Some like to put things in places that make semantic sense.
-
-```javascript
-loom.merge(Object, loom.noConflict())
-// loom is gone
-Object.punch //> function
-Object.append //> function, etc.
+```js
+exports.templates = [
+  'app/meal.js.ejs',
+  'test/unit/meal.spec.js.ejs'
+];
 ```
 
-[snack]:http://snackjs.com
-[ender]:http://ender.no.de
+Both templates will get the same data from `generator.present` and the
+files will be saved to the same relative path in your app as they are
+defined in your templates directory.
+
+### Default Generators
+
+If you define `loom/generators/default.js`, loom will use it when a
+specific generator is not found.
+
+Publishing Generators to NPM for Everybody
+------------------------------------------
+
+Name your module `loom-generators-<name>` (like
+`loom-generators-ember`), place generators, templates, and engines in
+`./loom`, and then publish.  That's it. People can simply `npm install
+loom-generators-<name> --save` and start using them.
+
+Publishing Template Engines to NPM for Everybody
+------------------------------------------------
+
+To add support for your favorite templating engine you can either add a
+file to `loom/engines` or publish a module to npm named
+`loom-engine-<ext>`. Loom will attempt to require the engine if it
+doesn't find it in your project.
+
+Generator API
+-------------
+
+Loom has a generic generator that can be overridden to meet your specific
+use case. Generators can export a few methods that loom will use.
+
+Your generator can implement as many methods as you need, loom will
+merge in the `generic_generator` methods that you don't provide.
+
+Here's a generator that does nothing:
+
+_loom/generators/noop.js_
+
+```js
+exports.before = function(){};
+exports.present = function(){};
+exports.savePath = function(){};
+exports.write = function(){};
+exports.render = function(){};
+exports.template = '';
+// exports.template = function(){};
+// exports.templates = [];
+// exports.templates = function(){};
+```
+
+Below is documentation on generator API, also, check out the [generic
+generator](lib/generic_generator).
+
+### generator.before
+
+Executes before anything else happens. Useful if you need to set or
+change some things on `env` before it moves through the other methods of
+your generator.
+
+#### signature
+
+`function(env)`
+
+#### arguments
+
+1. env (Object) - the loom environment object.
+
+
+### generator.present
+
+#### signature
+
+`function([argN] [, params], env)`
+
+#### arguments
+
+1. argN (String) - the space separated values used in the loom command
+2. params (Object) - the key:value pairs used in the loom command
+3. env (Object) - the loom environment object
+
+#### examples
+
+Lets make a generator that logs the arguments to explore how this works.
+
+_loom/generators/user.js_
+
+```js
+exports.present = function() {
+  console.log(arguments);
+};
+```
+
+The following are commands followed by what is logged for the arguments:
+
+```sh
+generate model user name:string age:number
+{ '0': 'user', '2': { name: 'string', age: 'number' } }
+
+generate model foo bar baz qux:1 quux:2
+{ '0': 'foo',
+  '1': 'bar',
+  '2': 'baz',
+  '3': { qux: '1', quux: '2' } }
+```
+
+As you can see, the space separated values become the arguments and the
+key=value pairs are wrapped up into an object for the final `params` argument.
+
+
+### generator.template
+
+Determines which template to render.
+
+`exports.template` can simply be a string, or a function if you need to
+compute it.
+
+Paths are relative to the `./loom/templates` directory.
+
+#### example
+
+To use a template found at
+`loom/templates/spec/models/model.spec.js.hbs`:
+
+```js
+exports.template = 'spec/models/model.spec.js.hbs';
+exports.template = function() {
+  // some computation
+  return 'spec/models/model.spec.js.hbs';
+};
+```
+
+#### notes
+
+Unless you override `generator.write` the generated file will be saved
+in the mirrored location in `loom/templates`, so the example above will
+be saved to `spec/models/<name>.spec.js`.
+
+### generator.templates
+
+Same as `template` but is an array of template paths that take
+precendence over `template`. Each template will receive the same locals
+returned from `present`. Can also be a function that returns an array.
+
+#### examples
+
+```js
+exports.templates = [
+  'app/models/model.js.ejs',
+  'spec/models/model.spec.js.ejs'
+];
+
+exports.templates = function() {
+  return [
+    'app/models/model.js.ejs',
+    'spec/models/model.spec.js.ejs'
+  ];
+};
+```
+
+### generator.savePath
+
+Determines the path in which to save a template.
+
+#### signature
+
+`function(template, env)`
+
+#### arguments
+
+1. template (String) - the path of the template being rendered
+2. env (Object) - the loom environment object
+
+### generator.write
+
+Writes a rendered template to the file system, its unlikely you'll want
+to override this.
+
+#### signature
+
+`function(templateName, src, env)`
+
+### generator.render
+
+Determines how to render the template, its unlinkely you'll want to
+override this.
+
+#### signature
+
+`function(engine, templatePath, locals)`
+
+TODO
+====
+
+- --force option to overwrite files (better for scripting so you don't
+  get the prompt)
+- async compatibility, right now all generator operations must be
+  sync
+
