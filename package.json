@@ -1,13 +1,37 @@
 {
   "name": "loom",
-  "description": "a simple and powerful API for differential inheritance and AOP",
-  "version": "1.0.0",
-  "homepage": "https://github.com/rpflorence/loom",
-  "authors": ["Ryan Florence <@ryanflorence>"],
+  "version": "2.0.0",
+  "description": "Weave your wefts betwixt the warps of loom generators and scaffolds.",
+  "main": "loom.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha --require should --reporter dot --ui bdd $(find test -name \"*.spec.js\")"
+  },
+  "bin": {
+    "generate": "./bin/generate"
+  },
+  "author": "Ryan Florence",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "~2.0.0",
+    "fs-extra": "~0.6.3",
+    "sync-prompt": "~0.1.0",
+    "loom-engine-hbs": "1.0.0",
+    "cli-color": "~0.2.2"
+  },
+  "devDependencies": {
+    "mocha": "~1.12.0",
+    "sinon": "~1.7.3",
+    "should": "~1.2.2"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rpflorence/loom.git"
+    "url": "git://github.com/rpflorence/loom"
   },
-  "main": "./src/loom.js",
-  "ender": "./src/ender.js"
+  "keywords": [
+    "generator",
+    "scaffold",
+    "template",
+    "templating"
+  ]
 }
+

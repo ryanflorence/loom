@@ -1,1 +1,0 @@
-(ender || $).ender(loom.noConflict())
