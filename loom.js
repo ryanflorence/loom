@@ -45,6 +45,7 @@ module.exports = function(argv) {
   if (program.stdout) {
     console.log(program.loom.out);
   }
+  return program.loom;
 };
 
 function initLoom() {
