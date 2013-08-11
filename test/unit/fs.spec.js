@@ -3,6 +3,8 @@ var fs = require('../../lib/fs');
 var msg = require('../../lib/message');
 var tmp = require('../support/tmp_dir');
 
+msg.silence();
+
 describe('fs', function() {
   var stub;
 
