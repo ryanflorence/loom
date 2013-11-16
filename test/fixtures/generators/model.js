@@ -1,8 +1,8 @@
-exports.present = function(name, fields) {
-  return {
+exports.present = function(name, fields, callback) {
+  callback({
     name: name,
     fields: fields
-  };
+  });
 };
 
 exports.templates = [

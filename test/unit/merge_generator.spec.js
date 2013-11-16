@@ -3,17 +3,22 @@ var mergeGenerator = require('../../lib/merge_generator');
 var genericGenerator = require('../../lib/generic_generator');
 
 describe('mergeGenerator', function() {
-  it('returns genericGenerator if none is found', function() {
+  it('callsback genericGenerator if none is found', function(done) {
     moveDefaultGenerator();
     var env = { name: 'foo', paths: ['test/fixtures'] };
-    mergeGenerator(env).should.equal(genericGenerator);
-    restoreDefaultGenerator();
+    mergeGenerator(env, function(generator) {
+      generator.should.equal(genericGenerator);
+      restoreDefaultGenerator();
+      done();
+    });
   });
 
-  it('merges genericGenerator into the generator', function() {
+  it('merges genericGenerator into the generator', function(done) {
     var env = { name: 'model', paths: ['test/fixtures'] };
-    var generator = mergeGenerator(env);
-    generator.render.should.equal(genericGenerator.render);
+    mergeGenerator(env, function(generator) {
+      generator.render.should.equal(genericGenerator.render);
+      done();
+    });
   });
 });
 
