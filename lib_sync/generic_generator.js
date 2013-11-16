@@ -13,9 +13,7 @@ var path = require('path');
  * Hook to modify `env` before anything else runs
  */
 
-exports.before = function(env, callback) {
-  callback();
-};
+exports.before = function(env) {};
 
 /*
  * The object returned becomes the object sent to the templating engine.
@@ -29,12 +27,12 @@ exports.before = function(env, callback) {
  * @param {Object} params
  */
 
-exports.present = function(objectName, params, callback) {
-  callback({
+exports.present = function(objectName, params) {
+  return {
     objectName: objectName,
     // last arg, skip anything inbetween like `generate model skipped param:foo`
     params: arguments[arguments.length - 2]
-  });
+  };
 };
 
 /*
@@ -57,21 +55,17 @@ exports.template = function(env) {
  * @param {Object} locals
  */
 
-exports.render = function(engine, templatePath, locals, callback) {
-  fs.readFile(templatePath, function(error, data) {
-    if (error) throw new Error(error);
-    engine(data.toString(), locals, function(src) {
-      callback(src);
-    });
-  })
+exports.render = function(engine, templatePath, locals) {
+  var src = fs.readFileSync(templatePath).toString();
+  return engine(src, locals);
 };
 
 /*
  * Writes rendered templates to the files system.
  */
 
-exports.write = function(savePath, src, env, callback) {
-  fs.confirmWriteFile(savePath, src, callback);
+exports.write = function(savePath, src, env) {
+  fs.confirmWriteFileSync(savePath, src);
 };
 
 /*
@@ -101,10 +95,10 @@ exports.write = function(savePath, src, env, callback) {
  * @param {Object} env - the loom environment
  */
 
-exports.savePath = function(template, env, callback) {
+exports.savePath = function(template, env) {
   var basename = path.basename(template);
   var name = env.args[0];
   var filename = basename.replace(env.name, name).replace(/\.[^/.]+$/, "");
-  callback(path.dirname(template)+'/'+filename);
+  return path.dirname(template)+'/'+filename;
 };
 

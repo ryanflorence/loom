@@ -2,12 +2,12 @@
  * gets a value from a value or function
  */
 
-module.exports = function (/*prop, args..., callback*/) {
+module.exports = function (/*prop, args...*/) {
   var prop = [].shift.call(arguments, 1);
   if ('function' == typeof prop) {
-    prop.apply(null, arguments);
+    return prop.apply(null, arguments);
   } else {
-    arguments[arguments.length - 1](prop);
+    return prop;
   }
 };
 

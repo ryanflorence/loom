@@ -2,7 +2,7 @@
  * utilities to print messages to the user
  */
 
-var prompt = require('cli-prompt');
+var prompt = require('sync-prompt').prompt;
 var color = require('cli-color');
 
 var green = color.green;
@@ -42,16 +42,14 @@ exports.fileExists = function(path) {
   print(yellow("   exists:\t") + path);
 };
 
-exports.confirm = function(question, callback) {
-  exports.prompt(question+' (y/n)', function(userInput) {
-    callback(userInput == 'y' || userInput == 'yes');
-  });
+exports.confirm = function(question) {
+  var userInput = exports.prompt(question+' (y/n)');
+  return userInput == 'y' || userInput == 'yes';
 };
 
 exports.prompt = function(question) {
-  prompt(yellow('-> ')+question+': ', function(input) {
-    callback(input.toLowerCase());
-  });
+  process.stdout.write(yellow('-> ')+question+': ');
+  return prompt().toLowerCase();
 };
 
 function print(text) {

@@ -5,25 +5,18 @@ var path = require('path');
  * looks for the first generator found in generator paths
  */
 
-module.exports = function(env, callback) {
+module.exports = function(env) {
   var generatorPath, basePath, relativePath;
   for (var i = 0; i < env.paths.length; i += 1) {
     relativePath = path.relative(process.cwd(), env.paths[i]+'/generators');
     basePath = path.resolve(relativePath);
     generatorPath = basePath+'/'+env.name+'.js';
     defaultPath = basePath+'/default.js';
-    fs.exists(generatorPath, function(exists) {
-      if (exists) {
-        callback(require(generatorPath));
-      }
-      fs.exists(defaultPath, function(exists) {
-        if (exists) {
-          callback(require(defaultPath));
-        } else if (i == env.paths.length - 1) {
-          callback(false);
-        }
-      });
-    });
+    if (fs.existsSync(generatorPath)) {
+      return require(generatorPath);
+    } else if (fs.existsSync(defaultPath)) {
+      return require(defaultPath);
+    }
   }
   return false;
 };

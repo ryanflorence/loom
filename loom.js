@@ -14,7 +14,7 @@ var msg = require('./lib/message');
  *   loom('model user name:string age:number');
  */
 
-module.exports = function(argv) {
+module.exports = function(argv, callback) {
   var program = new commander.Command();
 
   program.option(
@@ -55,13 +55,13 @@ module.exports = function(argv) {
   }
 
   parse(program);
-  run(program);
 
-  if (program.stdout) {
-    msg.notify(program.loom.out);
-  }
-
-  return program.loom;
+  run(program, function() {
+    if (program.stdout) {
+      msg.notify(program.loom.out);
+    }
+    callback(program.loom);
+  });
 };
 
 function initLoom() {
