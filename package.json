@@ -14,9 +14,9 @@
   "dependencies": {
     "commander": "~2.0.0",
     "fs-extra": "~0.6.3",
-    "sync-prompt": "~0.1.0",
-    "loom-engine-hbs": "1.0.0",
-    "cli-color": "~0.2.2"
+    "loom-engine-hbs": "2.0.0",
+    "cli-color": "~0.2.2",
+    "cli-prompt": "~0.3.2"
   },
   "devDependencies": {
     "mocha": "~1.12.0",
@@ -34,4 +34,3 @@
     "templating"
   ]
 }
-
