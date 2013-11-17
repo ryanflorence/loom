@@ -1,24 +1,42 @@
 var getTemplates = require('../../lib/get_templates');
 
 describe('getTemplates', function() {
-  it('gets generator.template as an array', function() {
-    getTemplates({ template: 'foo' }).should.eql(['foo']);
+  it('gets generator.template as an array', function(done) {
+    getTemplates({ template: 'foo' }, {}, function(templates) {
+      templates.should.eql(['foo']);
+      done();
+    });
   });
 
-  it('gets generator.templates', function() {
-    getTemplates({ templates: ['foo', 'bar'] }).should.eql(['foo', 'bar']);
+  it('gets generator.templates', function(done) {
+    getTemplates({ templates: ['foo', 'bar'] }, {}, function(templates) {
+      templates.should.eql(['foo', 'bar']);
+      done();
+    });
   });
 
-  it('gets generator.template function as an array', function() {
-    getTemplates({
-      template: function(){ return 'foo'; }
-    }).should.eql(['foo']);
+  it('gets generator.template function as an array', function(done) {
+    var generator = {
+      template: function(env, callback){
+        callback('foo');
+      }
+    };
+    getTemplates(generator, {}, function(templates) {
+      templates.should.eql(['foo']);
+      done();
+    });
   });
 
-  it('gets generator.templates function', function() {
-    getTemplates({
-      templates: function(){ return ['foo', 'bar']; }
-    }).should.eql(['foo', 'bar']);
+  it('gets generator.templates function', function(done) {
+    var generator = {
+      templates: function(env, callback){
+        callback(['foo', 'bar']);
+      }
+    };
+    getTemplates(generator, {}, function(templates) {
+      templates.should.eql(['foo', 'bar']);
+      done();
+    });
   });
 });
 
