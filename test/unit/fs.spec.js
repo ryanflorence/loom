@@ -9,7 +9,9 @@ describe('fs', function() {
   var stub;
 
   beforeEach(function(next) {
-    stub = sinon.stub(msg, 'confirm').returns(true);
+    stub = sinon.stub(msg, 'confirm', function(question, callback) {
+      callback(true);
+    });
     tmp.create(next);
   });
 
@@ -19,30 +21,41 @@ describe('fs', function() {
   });
 
   describe('confirmWriteFileSync', function() {
-    it("writes files that don't exists", function() {
+    it("writes files that don't exists", function(done) {
       var path = tmp.path+'/foo.txt';
-      fs.confirmWriteFileSync(path, 'bar');
-      fs.existsSync(path).should.equal(true);
-      fs.readFileSync(path).toString().should.equal('bar');
+      fs.confirmWriteFile(path, 'bar', function(err) {
+        fs.existsSync(path).should.equal(true);
+        fs.readFileSync(path).toString().should.equal('bar');
+        done();
+      });
     });
 
-    it("doesn't write files that exist when users says no", function() {
+    it("doesn't write files that exist when users says no", function(done) {
       var path = tmp.path+'/foo.txt';
-      fs.confirmWriteFileSync(path, 'bar');
-      fs.existsSync(path).should.equal(true);
-      stub.returns(false);
-      fs.readFileSync(path).toString().should.equal('bar');
-      fs.confirmWriteFileSync(path, 'baz');
-      fs.readFileSync(path).toString().should.equal('bar');
+      fs.confirmWriteFile(path, 'bar', function() {
+        fs.existsSync(path).should.equal(true);
+        stub.restore();
+        stub = sinon.stub(msg, 'confirm', function(question, callback) {
+          callback(false);
+        });
+        fs.readFileSync(path).toString().should.equal('bar');
+        fs.confirmWriteFile(path, 'baz', function() {
+          fs.readFileSync(path).toString().should.equal('bar');
+          done();
+        });
+      });
     });
 
-    it("overwrites files that exist when users says yes", function() {
+    it("overwrites files that exist when users says yes", function(done) {
       var path = tmp.path+'/foo.txt';
-      fs.confirmWriteFileSync(path, 'bar');
-      fs.existsSync(path).should.equal(true);
-      fs.readFileSync(path).toString().should.equal('bar');
-      fs.confirmWriteFileSync(path, 'baz');
-      fs.readFileSync(path).toString().should.equal('baz');
+      fs.confirmWriteFile(path, 'bar', function() {
+        fs.existsSync(path).should.equal(true);
+        fs.readFileSync(path).toString().should.equal('bar');
+        fs.confirmWriteFile(path, 'baz', function() {
+          fs.readFileSync(path).toString().should.equal('baz');
+          done();
+        });
+      });
     });
   });
 });
