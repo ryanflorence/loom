@@ -56,11 +56,11 @@ module.exports = function(argv, callback) {
 
   parse(program);
 
-  run(program, function() {
+  run(program, function(env) {
     if (program.stdout) {
       msg.notify(program.loom.out);
     }
-    callback(program.loom);
+    if (callback) { callback(env) };
   });
 };
 
