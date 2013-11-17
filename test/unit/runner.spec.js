@@ -1,7 +1,7 @@
 var run = require('../../lib/runner');
 
 describe('runner', function(){
-  it('generates templates', function() {
+  it('generates templates', function(done) {
     var program = {
       stdout: true,
       loom: {
@@ -11,8 +11,11 @@ describe('runner', function(){
         params: { name: 'string' }
       }
     };
-    run(program);
-    program.loom.out.should.equal('user string\nuser spec\n');
+    run(program, function(env) {
+      env.should.equal(program.loom);
+      env.out.should.equal('user string\nuser spec\n');
+      done();
+    });
   });
 });
 
