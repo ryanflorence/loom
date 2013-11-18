@@ -1,7 +1,7 @@
-exports.present = function(name, fields, env, callback) {
-  callback({
-    name: name,
-    fields: fields
+exports.present = function(next, env) {
+  next({
+    name: env.args[0],
+    fields: env.params
   });
 };
 
