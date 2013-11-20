@@ -2,7 +2,7 @@ var generator = require('../../lib/generic_generator');
 var fs = require(__dirname+'/../../lib/fs');
 var sinon = require('sinon');
 var fixture = require('../support/fixture');
-var engine = require('../fixtures/engines/noop');
+var engine = require('../fixtures/one/engines/noop');
 
 describe('generic_generator', function() {
 
@@ -20,8 +20,8 @@ describe('generic_generator', function() {
   });
 
   describe('render', function() {
-    it('renders a template', function() {
-      var template = fixture('templates/app/model.js.hbs');
+    it('renders a template', function(done) {
+      var template = fixture('one/templates/app/model.js.hbs');
       var src = fs.readFileSync(template).toString();
       var locals = {foo: 'bar'};
       generator.render(function(output) {
@@ -29,6 +29,7 @@ describe('generic_generator', function() {
           src: src,
           locals: locals
         });
+        done();
       }, {}, engine, template, locals);
     });
   });

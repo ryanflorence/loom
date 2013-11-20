@@ -17,8 +17,8 @@ describe('getTemplates', function() {
 
   it('gets generator.template function as an array', function(done) {
     var generator = {
-      template: function(env, callback){
-        callback('foo');
+      template: function(next, env){
+        next('foo');
       }
     };
     getTemplates(generator, {}, function(templates) {
@@ -29,8 +29,8 @@ describe('getTemplates', function() {
 
   it('gets generator.templates function', function(done) {
     var generator = {
-      templates: function(env, callback){
-        callback(['foo', 'bar']);
+      templates: function(next, env){
+        next(['foo', 'bar']);
       }
     };
     getTemplates(generator, {}, function(templates) {

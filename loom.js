@@ -19,8 +19,7 @@ module.exports = function(argv, callback) {
 
   program.option(
     '-p, --path [path]',
-    'path of directory containing generators',
-    'loom'
+    'path of directory containing generators'
   );
 
   program.option(

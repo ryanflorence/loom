@@ -21,13 +21,17 @@ Using generator packages from npm is easy:
 
 ```sh
 npm install loom-generators-ember --save
-generate model user name:string age:number
+npm install loom-generators-ember-qunit --save
+generate controller user name:string age:number
 ```
 
 Then refer to the documentation for the generators you've installed.
 
 You must install with `--save` or add the module to your package.json
 instead (that's how loom knows how to use them).
+
+If two generator sets respond to the same commands, they will both be
+run, allowing authors and consumers to compose them.
 
 Creating Your Own Generators
 ----------------------------
@@ -91,16 +95,18 @@ simplify the generator command.
 _loom/generators/meal.js_
 
 ```js
-exports.present = function(name, params) {
-  params.constructorName = name.charAt(0).toUpperCase() + name.slice(1);
-  return params;
+exports.present = function(next, env) {
+  var locals = env.params;
+  var name = env.args[0];
+  locals.constructorName = name.charAt(0).toUpperCase() + name.slice(1);
+  return locals;
 };
 
 exports.template = 'app/meal.js.hbs';
 ```
 
 Now our template is simpler, no more `{{params.food}}` and it
-capitalizes our constructor like a propery lady or gent.
+capitalizes our constructor like a proper lady or gent.
 
 _loom/templates/meal.js.hbs_
 
@@ -128,8 +134,8 @@ var _ = require('underscore');
 // module.exports = _.template
 // that works, but for clarity:
 
-module.exports = function(src, locals) {
-  return _.template(src, locals);
+module.exports = function(src, locals, callback) {
+  callback(_.template(src, locals));
 };
 ```
 
@@ -190,6 +196,7 @@ defined in your templates directory.
 If you define `loom/generators/default.js`, loom will use it when a
 specific generator is not found.
 
+
 Publishing Generators to NPM for Everybody
 ------------------------------------------
 
@@ -234,6 +241,13 @@ exports.template = '';
 Below is documentation on generator API, also, check out the [generic
 generator](lib/generic_generator).
 
+All methods share the first two arguments: `next`, and `env`.
+
+- `next` - all methods are asynchronous, so when you're done doing what
+  you need to do, call `next(val)`.
+- `env` - the loom environment, it contains all sorts of information
+  about the `generate` command the user ran.
+
 ### generator.before
 
 Executes before anything else happens. Useful if you need to set or
@@ -242,24 +256,25 @@ your generator.
 
 #### signature
 
-`function(env)`
+`function(next, env)`
 
-#### arguments
 
-1. env (Object) - the loom environment object.
+1. next (Function) - the callback.
+2. env (Object) - the loom environment object.
 
 
 ### generator.present
 
+You're probably going to want `env.args` and `env.params`.
+
 #### signature
 
-`function([argN] [, params], env)`
+`function(next, env)`
 
 #### arguments
 
-1. argN (String) - the space separated values used in the loom command
-2. params (Object) - the key:value pairs used in the loom command
-3. env (Object) - the loom environment object
+1. next (Function) - the callback.
+2. env (Object) - the loom environment object.
 
 #### examples
 
@@ -268,8 +283,8 @@ Lets make a generator that logs the arguments to explore how this works.
 _loom/generators/user.js_
 
 ```js
-exports.present = function() {
-  console.log(arguments);
+exports.present = function(next, env) {
+  console.log(env);
 };
 ```
 
@@ -277,17 +292,15 @@ The following are commands followed by what is logged for the arguments:
 
 ```sh
 generate model user name:string age:number
-{ '0': 'user', '2': { name: 'string', age: 'number' } }
+{ args: ['user'], params: { name: 'string', age: 'number' } }
 
 generate model foo bar baz qux:1 quux:2
-{ '0': 'foo',
-  '1': 'bar',
-  '2': 'baz',
-  '3': { qux: '1', quux: '2' } }
+{ args: ['foo', 'bar', 'baz' ]
+  params: { qux: '1', quux: '2' } }
 ```
 
-As you can see, the space separated values become the arguments and the
-key=value pairs are wrapped up into an object for the final `params` argument.
+As you can see, the space separated values become the `args` and the
+key:value pairs are wrapped up into the `params` argument.
 
 
 ### generator.template
@@ -306,9 +319,9 @@ To use a template found at
 
 ```js
 exports.template = 'spec/models/model.spec.js.hbs';
-exports.template = function() {
+exports.template = function(next) {
   // some computation
-  return 'spec/models/model.spec.js.hbs';
+  next('spec/models/model.spec.js.hbs');
 };
 ```
 
@@ -322,7 +335,7 @@ be saved to `spec/models/<name>.spec.js`.
 
 Same as `template` but is an array of template paths that take
 precendence over `template`. Each template will receive the same locals
-returned from `present`. Can also be a function that returns an array.
+returned from `present`. Can also be a function that calls back an array.
 
 #### examples
 
@@ -332,11 +345,11 @@ exports.templates = [
   'spec/models/model.spec.js.ejs'
 ];
 
-exports.templates = function() {
-  return [
+exports.templates = function(next) {
+  next([
     'app/models/model.js.ejs',
     'spec/models/model.spec.js.ejs'
-  ];
+  ]);
 };
 ```
 
@@ -346,12 +359,13 @@ Determines the path in which to save a template.
 
 #### signature
 
-`function(template, env)`
+`function(next, env, template)`
 
 #### arguments
 
-1. template (String) - the path of the template being rendered
+1. next (Function) - callback with the savePath you want
 2. env (Object) - the loom environment object
+3. template (String) - the path of the template being rendered
 
 ### generator.write
 
@@ -360,7 +374,7 @@ to override this.
 
 #### signature
 
-`function(templateName, src, env)`
+`function(next, env, savePath, src)`
 
 ### generator.render
 
@@ -369,13 +383,19 @@ override this.
 
 #### signature
 
-`function(engine, templatePath, locals)`
+`function(next, env, engine, templatePath, locals)`
 
 TODO
-====
+----
 
+- conflict resolution when two generators want to save to the same path
 - --force option to overwrite files (better for scripting so you don't
   get the prompt)
-- async compatibility, right now all generator operations must be
-  sync
+
+License and Copyright
+---------------------
+
+MIT Style license
+
+(c) 2013 Ryan Florence
 
