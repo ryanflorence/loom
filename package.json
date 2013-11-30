@@ -17,7 +17,8 @@
     "fs-extra": "~0.6.3",
     "loom-engine-hbs": "2.0.0",
     "cli-color": "~0.2.2",
-    "cli-prompt": "~0.3.2"
+    "cli-prompt": "~0.3.2",
+    "async": "~0.2.9"
   },
   "devDependencies": {
     "mocha": "~1.12.0",
