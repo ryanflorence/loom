@@ -10,7 +10,7 @@ describe('parser', function() {
     program.loom.should.eql({
       args: ['user'],
       name: 'model',
-      paths: ['loom'],
+      paths: [],
       params: { name: 'string' }
     });
   });
