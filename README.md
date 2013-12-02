@@ -14,14 +14,14 @@ development.**
 - override those generators
 - build your own generators for your specific app
 
-Using Loom Generator Packages from NPM
+Using Loom Generator Packages from npm
 --------------------------------------
 
 Using generator packages from npm is easy:
 
 ```sh
-npm install loom-generators-ember --save
-npm install loom-generators-ember-qunit --save
+npm install loom-ember --save
+npm install loom-ember-qunit --save
 generate controller user name:string age:number
 ```
 
@@ -197,15 +197,15 @@ If you define `loom/generators/default.js`, loom will use it when a
 specific generator is not found.
 
 
-Publishing Generators to NPM for Everybody
+Publishing Generators to npm for Everybody
 ------------------------------------------
 
-Name your module `loom-generators-<name>` (like
-`loom-generators-ember`), place generators, templates, and engines in
+Name your module `loom-<name>` (like
+`loom-ember`), place generators, templates, and engines in
 `./loom`, and then publish.  That's it. People can simply `npm install
-loom-generators-<name> --save` and start using them.
+loom-<name> --save` and start using them.
 
-Publishing Template Engines to NPM for Everybody
+Publishing Template Engines to npm for Everybody
 ------------------------------------------------
 
 To add support for your favorite templating engine you can either add a
