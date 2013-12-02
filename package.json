@@ -13,7 +13,7 @@
   "author": "Ryan Florence",
   "license": "MIT",
   "peerDependencies": {
-    "originate": "0.1.0"
+    "originate": "0.1.x"
   },
   "dependencies": {
     "commander": "~2.0.0",
