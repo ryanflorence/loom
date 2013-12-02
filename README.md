@@ -228,7 +228,6 @@ _loom/generators/noop.js_
 
 ```js
 exports.before = function(){};
-exports.after = function(){};
 exports.present = function(){};
 exports.savePath = function(){};
 exports.write = function(){};
@@ -259,18 +258,6 @@ your generator.
 
 `function(next, env)`
 
-1. next (Function) - the callback.
-2. env (Object) - the loom environment object.
-
-
-### generator.after
-
-Executes after everything else happens. Useful if you want to give the
-user some instructions about the files they just generated.
-
-#### signature
-
-`function(next, env)`
 
 1. next (Function) - the callback.
 2. env (Object) - the loom environment object.
