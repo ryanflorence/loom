@@ -12,6 +12,9 @@
   },
   "author": "Ryan Florence",
   "license": "MIT",
+  "peerDependencies": {
+    "originate": "0.1.0"
+  },
   "dependencies": {
     "commander": "~2.0.0",
     "fs-extra": "~0.6.3",

@@ -33,6 +33,22 @@ instead (that's how loom knows how to use them).
 If two generator sets respond to the same commands, they will both be
 run, allowing authors and consumers to compose them.
 
+Create New Project Scaffolds with `originate`
+---------------------------------------------
+
+In addition to generator sets, full project scaffolds are a simple
+command away when an author publishes a project to npm with a name
+matching `originate-*`.
+
+For example:
+
+```sh
+npm install -g loom
+originate ember my-new-app
+```
+
+Read more about [originate][1].
+
 Creating Your Own Generators
 ----------------------------
 
@@ -398,4 +414,7 @@ License and Copyright
 MIT Style license
 
 (c) 2013 Ryan Florence
+
+  [1]:https://github.com/rpflorence/originate
+
 
