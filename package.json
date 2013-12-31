@@ -26,7 +26,8 @@
   "devDependencies": {
     "mocha": "~1.12.0",
     "sinon": "~1.7.3",
-    "should": "~1.2.2"
+    "should": "~1.2.2",
+    "rimraf": "~2.2.5"
   },
   "repository": {
     "type": "git",
