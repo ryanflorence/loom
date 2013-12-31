@@ -6,7 +6,7 @@ exports.present = function(next, env) {
 };
 
 exports.templates = [
-  'app/model.js.hbs',
-  'spec/model.spec.js.hbs'
+  'tmp/model.js.hbs',
+  'tmp/model.spec.js.hbs'
 ];
 

@@ -22,7 +22,7 @@ describe('generic_generator', function() {
 
   describe('render', function() {
     it('renders a template', function(done) {
-      var template = fixture('one/templates/app/model.js.hbs');
+      var template = fixture('one/templates/tmp/model.js.hbs');
       var src = fs.readFileSync(template).toString();
       var locals = {foo: 'bar'};
       generator.render(function(output) {

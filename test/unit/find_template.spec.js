@@ -3,8 +3,8 @@ var fixture = require('../support/fixture');
 
 describe('find_template', function() {
   it('finds a template', function(done) {
-    var expected = 'test/fixtures/one/templates/app/model.js.hbs';
-    findTemplate('app/model.js.hbs', 'test/fixtures/one', function(template) {
+    var expected = 'test/fixtures/one/templates/tmp/model.js.hbs';
+    findTemplate('tmp/model.js.hbs', 'test/fixtures/one', function(template) {
       template.should.equal(expected);
       done();
     });
