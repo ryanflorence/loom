@@ -2,12 +2,14 @@ var parse = require('../../lib/parser');
 
 describe('parser', function() {
   it('parses arguments and params', function() {
-    var program = {
+    var cmd = {
       path: 'some/where',
-      args: ['model', 'user', 'name:string']
+      parent: {
+        args: ['model', 'user', 'name:string', cmd]
+      }
     };
-    parse(program);
-    program.loom.should.eql({
+    parse(cmd);
+    cmd.parent.loom.should.eql({
       args: ['user'],
       name: 'model',
       paths: ['some/where'],

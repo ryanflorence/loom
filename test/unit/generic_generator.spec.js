@@ -11,6 +11,7 @@ describe('generic_generator', function() {
       var env = {name: 'model', args: ['user'], params: {name: 'string'}};
       generator.present(function(locals) {
         locals.should.eql({
+          name: 'user',
           objectName: 'user',
           params: { name: 'string' }
         });
